@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="Application de suivi de guérison L5/S1">
+    <title>Suivi Guérison L5/S1</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 5rem;
+        }
+
+        .header {
+            text-align: center;
+            margin: 2rem 0 2rem 0;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .walk-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #eff6ff;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .walk-item p {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .walk-item button {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+        }
+
+        .summary {
+            background: linear-gradient(to right, #3b82f6, #4f46e5);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pain-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .pain-bar span:first-child {
+            width: 40px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .pain-bar-container {
+            flex: 1;
+            background: #e5e7eb;
+            border-radius: 9999px;
+            height: 24px;
+            overflow: hidden;
+        }
+
+        .pain-bar-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .pain-bar-fill.low {
+            background: #10b981;
+        }
+
+        .pain-bar-fill.medium {
+            background: #eab308;
+        }
+
+        .pain-bar-fill.high {
+            background: #ef4444;
+        }
+
+        .pain-bar-fill.empty {
+            background: #d1d5db;
+        }
+
+        .pain-bar span:last-child {
+            width: 48px;
+            text-align: right;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .form input,
+        .form label {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+
+        .form input {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+
+        .form label {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .form-buttons button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #d1d5db;
+            color: #1f2937;
+        }
+
+        .btn-primary:active {
+            background: #2563eb;
+        }
+
+        .btn-secondary:active {
+            background: #9ca3af;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 0.75rem;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add:active {
+            background: #2563eb;
+        }
+
+        .btn-add-pain {
+            background: #6366f1;
+        }
+
+        .btn-add-pain:active {
+            background: #4f46e5;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #9ca3af;
+            padding: 1rem;
+        }
+
+        .slider-container {
+            margin: 1.5rem 0;
+        }
+
+        .slider-container input {
+            width: 100%;
+            height: 12px;
+            border-radius: 5px;
+            background: #d1d5db;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-container input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .slider-container input::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-top: 0.75rem;
+        }
+
+        .chart-container {
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .motivation {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            color: #15803d;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .chart-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .chart-bar-container {
+            width: 100%;
+            display: flex;
+            gap: 2px;
+        }
+
+        .chart-bar-item {
+            flex: 1;
+            background: #3b82f6;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .chart-bar-label {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Suivi Guérison</h1>
+            <p>L5/S1 - Progression positive</p>
+        </div>
+
+        <!-- MARCHES -->
+        <div class="card">
+            <h2>📍 Marches Aujourd'hui</h2>
+            <div id="walksList"></div>
+            <div id="walkSummary"></div>
+            <div id="walkForm" style="display: none;">
+                <div class="form">
+                    <label>Heure</label>
+                    <input type="time" id="walkTime" value="12:00">
+                    
+                    <label>Durée (minutes)</label>
+                    <input type="number" id="walkDuration" placeholder="Ex: 12">
+                    
+                    <label>Nombre de pas</label>
+                    <input type="number" id="walkSteps" placeholder="Ex: 1050">
+                    
+                    <label>Commentaire (optionnel)</label>
+                    <input type="text" id="walkComment" placeholder="Ex: Bonne marche, sans douleur!">
+                    
+                    <div class="form-buttons">
+                        <button class="btn-primary" onclick="app.addWalk()">Ajouter</button>
+                        <button class="btn-secondary" onclick="app.toggleWalkForm()">Annuler</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-add" onclick="app.toggleWalkForm()">
+                <span>➕</span> Ajouter une marche
+            </button>
+        </div>
+
+        <!-- DOULEUR -->
+        <div class="card">
+            <h2>😔 Douleur Semaine</h2>
+            <div id="painList"></div>
+            <div id="painForm" style="display: none;">
+                <div class="form">
+                    <label>Comment est votre douleur aujourd'hui ?</label>
+                    <div class="slider-container">
+                        <input type="range" id="painSlider" min="0" max="10" value="5" oninput="app.updatePainValue()">
+                        <div class="slider-value" id="painValue">5</div>
+                    </div>
+                    <div class="form-buttons">
+                        <button class="btn-primary" onclick="app.addPain()">Enregistrer</button>
+                        <button class="btn-secondary" onclick="app.togglePainForm()">Annuler</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-add btn-add-pain" onclick="app.togglePainForm()">
+                <span>➕</span> Noter douleur d'aujourd'hui
+            </button>
+        </div>
+
+        <!-- GRAPHIQUE -->
+        <div class="card" id="chartCard" style="display: none;">
+            <h2>📈 Tendance (4 semaines)</h2>
+            <div class="chart" id="chart"></div>
+        </div>
+
+        <div class="motivation">
+            ✨ Chaque marche est une victoire ! Continuez ainsi 💪
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            walks: [],
+            pain: [],
+
+            init() {
+                this.loadData();
+                this.render();
+                this.registerServiceWorker();
+            },
+
+            loadData() {
+                const savedWalks = localStorage.getItem('walks');
+                const savedPain = localStorage.getItem('pain');
+                this.walks = savedWalks ? JSON.parse(savedWalks) : [];
+                this.pain = savedPain ? JSON.parse(savedPain) : [];
+            },
+
+            saveData() {
+                localStorage.setItem('walks', JSON.stringify(this.walks));
+                localStorage.setItem('pain', JSON.stringify(this.pain));
+            },
+
+            getToday() {
+                const now = new Date();
+                return now.toISOString().split('T')[0];
+            },
+
+            getTodayWalks() {
+                const today = this.getToday();
+                return this.walks.filter(w => w.date === today);
+            },
+
+            toggleWalkForm() {
+                const form = document.getElementById('walkForm');
+                const btn = document.querySelector('.btn-add');
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                btn.style.display = form.style.display === 'none' ? 'block' : 'none';
+            },
+
+            togglePainForm() {
+                const form = document.getElementById('painForm');
+                const btn = document.querySelectorAll('.btn-add')[1];
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                btn.style.display = form.style.display === 'none' ? 'block' : 'none';
+            },
+
+            addWalk() {
+                const time = document.getElementById('walkTime').value;
+                const duration = parseInt(document.getElementById('walkDuration').value);
+                const steps = parseInt(document.getElementById('walkSteps').value);
+                const comment = document.getElementById('walkComment').value;
+
+                if (!time || !duration || !steps) {
+                    alert('Veuillez remplir tous les champs obligatoires');
+                    return;
+                }
+
+                this.walks.push({
+                    id: Date.now(),
+                    date: this.getToday(),
+                    time,
+                    duration,
+                    steps,
+                    comment: comment || ''
+                });
+
+                this.saveData();
+                this.toggleWalkForm();
+                document.getElementById('walkTime').value = '12:00';
+                document.getElementById('walkDuration').value = '';
+                document.getElementById('walkSteps').value = '';
+                document.getElementById('walkComment').value = '';
+                this.render();
+            },
+
+            deleteWalk(id) {
+                this.walks = this.walks.filter(w => w.id !== id);
+                this.saveData();
+                this.render();
+            },
+
+            addPain() {
+                const level = parseInt(document.getElementById('painSlider').value);
+                const today = this.getToday();
+                const existing = this.pain.findIndex(p => p.date === today);
+
+                if (existing >= 0) {
+                    this.pain[existing].level = level;
+                } else {
+                    this.pain.push({ date: today, level });
+                }
+
+                this.saveData();
+                this.togglePainForm();
+                this.render();
+            },
+
+            updatePainValue() {
+                const value = document.getElementById('painSlider').value;
+                document.getElementById('painValue').textContent = value;
+            },
+
+            getLast7Days() {
+                const days = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    const dayName = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][date.getDay()];
+                    const pain = this.pain.find(p => p.date === dateStr);
+                    days.push({
+                        date: dateStr,
+                        day: dayName,
+                        level: pain ? pain.level : null
+                    });
+                }
+                return days;
+            },
+
+            getChartData() {
+                const data = [];
+                for (let i = 27; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    const week = Math.floor(i / 7);
+                    const weekLabel = `S${4 - week}`;
+
+                    let existing = data.find(d => d.week === weekLabel);
+                    if (!existing) {
+                        existing = { week: weekLabel, pain: 0, count: 0, steps: 0 };
+                        data.push(existing);
+                    }
+
+                    const pain = this.pain.find(p => p.date === dateStr);
+                    const weekWalks = this.walks.filter(w => w.date === dateStr);
+
+                    if (pain) {
+                        existing.pain += pain.level;
+                        existing.count += 1;
+                    }
+                    existing.steps += weekWalks.reduce((sum, w) => sum + w.steps, 0);
+                }
+
+                return data.map(d => ({
+                    week: d.week,
+                    pain: d.count > 0 ? Math.round(d.pain / d.count) : 0,
+                    steps: d.steps
+                }));
+            },
+
+            render() {
+                this.renderWalks();
+                this.renderPain();
+                this.renderChart();
+            },
+
+            renderWalks() {
+                const todayWalks = this.getTodayWalks();
+                const container = document.getElementById('walksList');
+                const summary = document.getElementById('walkSummary');
+
+                if (todayWalks.length === 0) {
+                    container.innerHTML = '<p class="empty-message">Aucune marche enregistrée</p>';
+                    summary.innerHTML = '';
+                    return;
+                }
+
+                container.innerHTML = todayWalks.map(walk => `
+                    <div class="walk-item">
+                        <div>
+                            <p>🕐 ${walk.time} - ${walk.duration} min - ${walk.steps} pas</p>
+                            ${walk.comment ? `<p style="font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem;">💬 ${walk.comment}</p>` : ''}
+                        </div>
+                        <button onclick="app.deleteWalk(${walk.id})">🗑️</button>
+                    </div>
+                `).join('');
+
+                const totalDuration = todayWalks.reduce((sum, w) => sum + w.duration, 0);
+                const totalSteps = todayWalks.reduce((sum, w) => sum + w.steps, 0);
+
+                summary.innerHTML = `
+                    <div class="summary">
+                        📊 Total: ${totalDuration} min | ${totalSteps} pas
+                    </div>
+                `;
+            },
+
+            renderPain() {
+                const last7Days = this.getLast7Days();
+                const container = document.getElementById('painList');
+
+                container.innerHTML = last7Days.map(day => {
+                    let fillClass = 'empty';
+                    let width = '0%';
+                    let label = '-';
+
+                    if (day.level !== null) {
+                        width = `${day.level * 10}%`;
+                        label = `${day.level}/10`;
+                        if (day.level <= 3) fillClass = 'low';
+                        else if (day.level <= 6) fillClass = 'medium';
+                        else fillClass = 'high';
+                    }
+
+                    return `
+                        <div class="pain-bar">
+                            <span>${day.day}:</span>
+                            <div class="pain-bar-container">
+                                <div class="pain-bar-fill ${fillClass}" style="width: ${width}"></div>
+                            </div>
+                            <span>${label}</span>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            renderChart() {
+                const data = this.getChartData();
+                if (!data.some(d => d.pain > 0 || d.steps > 0)) {
+                    document.getElementById('chartCard').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('chartCard').style.display = 'block';
+
+                const maxPain = Math.max(...data.map(d => d.pain), 10);
+                const maxSteps = Math.max(...data.map(d => d.steps), 1000);
+
+                const chart = document.getElementById('chart');
+                chart.innerHTML = data.map(d => {
+                    const painHeight = (d.pain / maxPain) * 150;
+                    const stepsHeight = (d.steps / maxSteps) * 150;
+
+                    return `
+                        <div class="chart-bar">
+                            <div class="chart-bar-container">
+                                <div class="chart-bar-item" style="height: ${painHeight}px; background: #ef4444;"></div>
+                                <div class="chart-bar-item" style="height: ${stepsHeight}px; background: #3b82f6;"></div>
+                            </div>
+                            <div class="chart-bar-label">${d.week}</div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js').catch(() => {});
+                }
+            }
+        };
+
+        app.init();
+    </script>
+</body>
+</html>
