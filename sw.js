@@ -1,8 +1,9 @@
 const CACHE_NAME = 'suivi-guerison-v1';
+const BASE_PATH = '/suivi-guerison';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  BASE_PATH + '/',
+  BASE_PATH + '/index.html',
+  BASE_PATH + '/manifest.json'
 ];
 
 self.addEventListener('install', event => {
@@ -17,6 +18,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => response || fetch(event.request))
-      .catch(() => caches.match('/index.html'))
+      .catch(() => caches.match(BASE_PATH + '/index.html'))
   );
 });
