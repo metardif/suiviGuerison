@@ -1,5 +1,5 @@
 const CACHE_NAME = 'suivi-guerison-v1';
-const BASE_PATH = '/suivi-guerison';
+const BASE_PATH = '/suiviGuerison';
 const urlsToCache = [
   BASE_PATH + '/',
   BASE_PATH + '/index.html',
